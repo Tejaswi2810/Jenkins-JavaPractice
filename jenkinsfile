@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_REGION = 'us-east-1'           // your AWS region
+        S3_BUCKET = 'jenkins-first-s3bucket' // your S3 bucket name
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build & Test') {
+            steps {
+                sh 'mvn clean package'  // runs tests and builds jar
+            }
+        }
+
+        stage('Upload to S3') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'aws-credentials', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    withEnv([
+                        "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID",
+                        "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY",
+                        "AWS_REGION=$AWS_REGION"
+                    ]) {
+                        sh '''
+                            ARTIFACT=$(find target -name "*.jar" | head -n 1)
+                            BUILD_ID=$(date +%Y%m%d%H%M%S)
+                            ARTIFACT_NAME=$(basename "$ARTIFACT")
+                            NEW_ARTIFACT_NAME="${ARTIFACT_NAME%.jar}-$BUILD_ID.jar"
+                            cp "$ARTIFACT" "target/$NEW_ARTIFACT_NAME"
+                            aws s3 cp "target/$NEW_ARTIFACT_NAME" "s3://$S3_BUCKET/"
+                        '''
+                    }
+                }
+            }
+        }
+    }
+}
