@@ -21,7 +21,7 @@ pipeline {
 
         stage('Upload to S3') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'aws-credentials', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                withCredentials([usernamePassword(credentialsId: '888b8e39-bcd2-4b29-831c-0267c2374b79', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     withEnv([
                         "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID",
                         "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY",
