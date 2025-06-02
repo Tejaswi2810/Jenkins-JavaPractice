@@ -4,7 +4,7 @@ pipeline {
     environment {
         AWS_REGION = 'us-east-1'           // your AWS region
         S3_BUCKET = 'jenkins-first-s3bucket' // your S3 bucket
-    }
+    }//changes made
 
     stages {
         stage('Checkout') {
